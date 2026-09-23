@@ -7,10 +7,10 @@
     <meta name="referrer" content="no-referrer">
     <meta name="robots" content="noindex, nofollow, noarchive">
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; connect-src 'none'">
-    <title>Until You Say · Zeit für einen Moment</title>
+    <title>Until You Say</title>
     <link rel="icon" href="./icon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="./style.css">
-    <script src="./app.js?v=4" defer></script>
+    <link rel="stylesheet" href="./style.css?v=5">
+    <script src="./app.js?v=5" defer></script>
   </head>
   <body>
     <main class="shell">
@@ -24,7 +24,6 @@
         </header>
 
         <section id="timer-view" hidden>
-          <p class="eyebrow">Jeder Moment zählt</p>
           <h1>Du bestimmst, wann ich darf. 😇</h1>
           <div class="ornament" aria-hidden="true"><span></span><i>✧</i><span></span></div>
 
@@ -39,18 +38,8 @@
           </div>
 
           <p class="since">Seit <time id="start-time"></time></p>
-
-          <p class="status"><span class="status-dot" aria-hidden="true"></span><span>Ich warte. 😏</span></p>
-          <button class="share" type="button" id="share-button">Link kopieren <span aria-hidden="true">↗</span></button>
+          <p class="closing">Du leidest ja nicht. Ich schon. 😏</p>
         </section>
-
-        <section class="empty" id="empty-view" hidden>
-          <div class="empty-symbol" aria-hidden="true">✧</div>
-          <h1>Die Zeit wartet auf ihren Moment.</h1>
-          <p>Öffne deinen persönlichen Link, um den Timer zu sehen.</p>
-        </section>
-
-        <footer>Ein Augenblick nach dem anderen <span aria-hidden="true">✦</span></footer>
       </article>
     </main>
   </body>
