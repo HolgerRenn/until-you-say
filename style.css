@@ -22,6 +22,6 @@ h1 { margin: 54px auto 0; max-width: 360px; font-family: Georgia, "Times New Rom
 .clock-separator { padding-top: 3px; color: #b88b9d; font-size: clamp(25px, 7vw, 38px); font-weight: 200; line-height: 1; }
 .since { margin: 24px 0 0; color: #c7b4c3; font-size: 12px; }
 .since time { color: #f3dce7; font-weight: 600; }
-.closing { margin: 48px 0 0; color: #f3d7df; font-family: Georgia, "Times New Roman", serif; font-size: clamp(17px, 4.5vw, 20px); line-height: 1.35; }
+.closing { margin: 48px 0 0; color: #f3d7df; font-size: 12px; font-weight: 700; letter-spacing: .16em; line-height: 1.5; }
 [hidden] { display: none !important; }
 @media (min-width: 600px) { .card { padding-top: 38px; padding-bottom: 50px; } }
