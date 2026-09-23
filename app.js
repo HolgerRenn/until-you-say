@@ -1,4 +1,4 @@
-/* Timeline data lives in timestamps.js. No network or storage. */
+/* Timeline data is loaded fresh from timestamps.js on each page load. */
 (() => {
   const $ = (id) => document.getElementById(id);
   const two = (value) => String(value).padStart(2, "0");
@@ -140,8 +140,16 @@
     if (expanded || phase.end === null || Date.now() < phase.end) ticker = setInterval(tick, 1000);
   }
 
+  function loadTimeline() {
+    const script = document.createElement("script");
+    script.src = `./timestamps.js?ts=${Date.now()}`;
+    script.onload = render;
+    script.onerror = () => { $("timer-view").hidden = true; };
+    document.head.append(script);
+  }
+
   document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });
   $("sort-newest").addEventListener("click", () => { sortMode = "newest"; render(); });
   $("sort-longest").addEventListener("click", () => { sortMode = "longest"; render(); });
-  render();
+  loadTimeline();
 })();
