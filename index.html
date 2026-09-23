@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#171326">
+    <meta name="referrer" content="no-referrer">
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; connect-src 'none'">
+    <title>Until You Say · Zeit für einen Moment</title>
+    <link rel="icon" href="./icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./style.css">
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <main class="shell">
+      <div class="ambient ambient-one" aria-hidden="true"></div>
+      <div class="ambient ambient-two" aria-hidden="true"></div>
+      <article class="card" id="card">
+        <header class="masthead">
+          <span class="mark" aria-hidden="true">✦</span>
+          <span class="brand">UNTIL YOU SAY</span>
+          <span class="mark" aria-hidden="true">✦</span>
+        </header>
+
+        <section id="timer-view" hidden>
+          <p class="eyebrow">Jeder Moment zählt</p>
+          <h1 id="headline"></h1>
+          <div class="ornament" aria-hidden="true"><span></span><i>✧</i><span></span></div>
+
+          <div class="clock" role="timer" aria-label="Zeit seit dem Start">
+            <div class="clock-unit"><strong id="days">0</strong><span>Tage</span></div>
+            <b class="clock-separator" aria-hidden="true">:</b>
+            <div class="clock-unit"><strong id="hours">00</strong><span>Stunden</span></div>
+            <b class="clock-separator" aria-hidden="true">:</b>
+            <div class="clock-unit"><strong id="minutes">00</strong><span>Minuten</span></div>
+            <b class="clock-separator" aria-hidden="true">:</b>
+            <div class="clock-unit"><strong id="seconds">00</strong><span>Sekunden</span></div>
+          </div>
+
+          <p class="since">Seit <time id="start-time"></time></p>
+
+          <div class="checkpoint" id="checkpoint">
+            <div class="checkpoint-top"><span class="checkpoint-icon" aria-hidden="true">◇</span><span>PRÜFPUNKT</span></div>
+            <p class="checkpoint-label" id="checkpoint-label"></p>
+            <strong class="checkpoint-value" id="checkpoint-value"></strong>
+            <p class="checkpoint-date"><time id="checkpoint-time"></time></p>
+          </div>
+
+          <p class="status"><span class="status-dot" aria-hidden="true"></span><span id="status-text"></span></p>
+          <button class="share" type="button" id="share-button">Link kopieren <span aria-hidden="true">↗</span></button>
+        </section>
+
+        <section class="empty" id="empty-view" hidden>
+          <div class="empty-symbol" aria-hidden="true">✧</div>
+          <h1>Die Zeit wartet auf ihren Moment.</h1>
+          <p>Öffne deinen persönlichen Link, um den Timer zu sehen.</p>
+        </section>
+
+        <footer>Ein Augenblick nach dem anderen <span aria-hidden="true">✦</span></footer>
+      </article>
+    </main>
+  </body>
+</html>
