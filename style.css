@@ -35,6 +35,10 @@ h1 { margin: 54px auto 0; max-width: 360px; font-family: Georgia, "Times New Rom
 .closing { margin: 48px 0 0; color: #f3d7df; font-size: clamp(15px, 4vw, 17px); font-weight: 650; letter-spacing: .09em; line-height: 1.45; }
 .history { margin-top: 44px; border-top: 1px solid rgba(244, 207, 220, .19); text-align: left; }
 .history h2 { margin: 25px 0 0; color: #ddbac7; font-size: 12px; font-weight: 650; letter-spacing: .06em; }
+.history-sort { display: flex; gap: 8px; margin: 16px 0 0; }
+.history-sort button { border: 1px solid rgba(244, 207, 220, .25); border-radius: 999px; padding: 7px 13px; background: transparent; color: #c7b4c3; font: inherit; font-size: 11px; cursor: pointer; }
+.history-sort button[aria-pressed="true"] { border-color: rgba(244, 207, 220, .45); background: rgba(244, 207, 220, .14); color: #f7edf4; }
+.history-sort button:focus-visible { outline: 2px solid #f3dce7; outline-offset: 3px; }
 .history #history-list > div { padding-top: 22px; color: #c7b4c3; font-size: 12px; line-height: 1.6; }
 .history #history-list > div + div { margin-top: 20px; border-top: 1px solid rgba(244, 207, 220, .12); }
 .history .phase-label { margin: 0 0 12px; }

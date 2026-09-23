@@ -11,6 +11,7 @@
   const withinRange = (value) => Number.isSafeInteger(value) &&
     value >= Date.UTC(2000, 0, 1) && value <= Date.UTC(2100, 0, 1);
   let ticker;
+  let sortMode = "newest";
 
   function parsePhases(fragment) {
     const parts = fragment.split("~");
@@ -55,10 +56,16 @@
     const completed = phases.map((phase, index) => ({ ...phase, index }))
       .filter((phase) => phase.end !== null && phase.end <= now);
     history.hidden = !expanded || completed.length === 0;
+    $("history-sort").hidden = !expanded || completed.length < 2;
     if (history.hidden) return;
     $("history-title").textContent = completed.length === 1
       ? "Abgeschlossene Enthaltsamkeit"
       : "Abgeschlossene Enthaltsamkeiten";
+    $("sort-newest").setAttribute("aria-pressed", String(sortMode === "newest"));
+    $("sort-longest").setAttribute("aria-pressed", String(sortMode === "longest"));
+    completed.sort(sortMode === "longest"
+      ? (a, b) => (b.end - b.start) - (a.end - a.start) || b.end - a.end
+      : (a, b) => b.end - a.end);
     completed.forEach((phase) => {
       const entry = document.createElement("div");
       const label = document.createElement("p");
@@ -132,5 +139,7 @@
 
   window.addEventListener("hashchange", render);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });
+  $("sort-newest").addEventListener("click", () => { sortMode = "newest"; render(); });
+  $("sort-longest").addEventListener("click", () => { sortMode = "longest"; render(); });
   render();
 })();
