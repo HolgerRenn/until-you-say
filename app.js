@@ -15,20 +15,16 @@
 
   function parsePhases(fragment) {
     const parts = fragment.split("~");
-    if (parts.length > 20) return null;
-    const phases = parts.map((part) => {
-      if (!/^[0-9a-z]{1,9}(?:\.[0-9a-z]{1,9})?$/.test(part)) return null;
-      const [startPart, endPart] = part.split(".");
-      const start = parseInt(startPart, 36) * 1000;
-      const end = endPart === undefined ? null : parseInt(endPart, 36) * 1000;
-      if (!withinRange(start) || (end !== null && (!withinRange(end) || end <= start))) return null;
-      return { start, end };
-    });
-    if (phases.some((phase) => !phase)) return null;
-    for (let i = 1; i < phases.length; i++) {
-      if (phases[i - 1].end === null || phases[i].start < phases[i - 1].end) return null;
+    if (parts.length > 20 || parts.some((part) => !/^[0-9a-z]{1,9}$/.test(part))) return null;
+    const boundaries = parts.map((part) => parseInt(part, 36) * 1000);
+    if (boundaries.some((instant) => !withinRange(instant))) return null;
+    for (let i = 1; i < boundaries.length; i++) {
+      if (boundaries[i] <= boundaries[i - 1]) return null;
     }
-    return phases;
+    return boundaries.map((start, index) => ({
+      start,
+      end: index + 1 < boundaries.length ? boundaries[index + 1] : null
+    }));
   }
 
   function formatted(instant) {
