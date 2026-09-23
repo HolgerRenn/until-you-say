@@ -9,11 +9,24 @@
 
   function decodeConfig() {
     const hash = location.hash.slice(1);
-    if (!/^v1\.[A-Za-z0-9_-]{1,4000}$/.test(hash)) return null;
+    if (!/^v[12]\.[A-Za-z0-9_-]{1,4000}$/.test(hash)) return null;
     try {
       const encoded = hash.slice(3).replace(/-/g, "+").replace(/_/g, "/");
       const bytes = Uint8Array.from(atob(encoded), (character) => character.charCodeAt(0));
-      const config = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
+      const data = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
+      if (hash.startsWith("v2.")) {
+        if (!Array.isArray(data) || data.length !== 5 ||
+            !data.slice(0, 2).every((value) => typeof value === "string" && /^[0-9a-z]{1,9}$/.test(value))) return null;
+        const [startSeconds, checkpointSeconds, title, waiting, reached] = data;
+        const start = parseInt(startSeconds, 36) * 1000;
+        const checkpoint = parseInt(checkpointSeconds, 36) * 1000;
+        if (!Number.isSafeInteger(start) || !Number.isSafeInteger(checkpoint) ||
+            checkpoint <= start || ![title, waiting, reached].every((value) => typeof value === "string" && value.length <= 180)) return null;
+        const days = Math.round((checkpoint - start) / 86400000);
+        return { start, checkpoint, title, waiting, reached,
+          checkpointLabel: `Noch bis zum ${days}-Tage-Prüfpunkt` };
+      }
+      const config = data;
       const validText = (value) => typeof value === "string" && value.length <= 180;
       if (config.v !== 1 || !validText(config.title) || !validText(config.waiting) ||
           !validText(config.reached) || !validText(config.checkpointLabel) ||
