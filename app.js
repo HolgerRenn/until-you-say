@@ -1,14 +1,51 @@
-/* Personal data is read from the URL fragment only. No network requests or storage. */
+/* The start instant is read from the URL fragment. No network requests or storage. */
 (() => {
   const $ = (id) => document.getElementById(id);
   const two = (number) => String(number).padStart(2, "0");
+  const fixedText = {
+    title: "Du bestimmst, wann ich darf. 😇",
+    waiting: "Ich warte. 😏",
+    reached: "Checkpoint erreicht – Freigabe offen.",
+    checkpointLabel: "Noch bis zum 10-Tage-Prüfpunkt"
+  };
   const formatter = new Intl.DateTimeFormat("de-DE", {
     timeZone: "Europe/Berlin", day: "numeric", month: "long", year: "numeric",
     hour: "2-digit", minute: "2-digit"
   });
+  const partsFormatter = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/Berlin", year: "numeric", month: "numeric", day: "numeric",
+    hour: "numeric", minute: "numeric", second: "numeric", hourCycle: "h23"
+  });
+  const offsetFormatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Europe/Berlin", timeZoneName: "shortOffset"
+  });
+
+  function berlinOffset(instant) {
+    const label = offsetFormatter.formatToParts(instant).find((part) => part.type === "timeZoneName")?.value;
+    const match = /^GMT([+-])(\d{1,2})(?::(\d{2}))?$/.exec(label || "");
+    if (!match) return NaN;
+    return (match[1] === "+" ? 1 : -1) * (Number(match[2]) * 60 + Number(match[3] || 0)) * 60000;
+  }
+
+  function tenBerlinDaysLater(start) {
+    const parts = Object.fromEntries(partsFormatter.formatToParts(start)
+      .filter((part) => part.type !== "literal").map((part) => [part.type, Number(part.value)]));
+    const wallTime = Date.UTC(parts.year, parts.month - 1, parts.day + 10,
+      parts.hour, parts.minute, parts.second);
+    let instant = wallTime - berlinOffset(wallTime);
+    instant = wallTime - berlinOffset(instant);
+    return instant;
+  }
 
   function decodeConfig() {
     const hash = location.hash.slice(1);
+    if (/^[0-9a-z]{1,9}$/.test(hash)) {
+      const start = parseInt(hash, 36) * 1000;
+      const checkpoint = tenBerlinDaysLater(start);
+      if (!Number.isSafeInteger(start) || !Number.isFinite(checkpoint) ||
+          start < Date.UTC(2000, 0, 1) || start > Date.UTC(2100, 0, 1)) return null;
+      return { start, checkpoint, ...fixedText };
+    }
     if (!/^v[12]\.[A-Za-z0-9_-]{1,4000}$/.test(hash)) return null;
     try {
       const encoded = hash.slice(3).replace(/-/g, "+").replace(/_/g, "/");
