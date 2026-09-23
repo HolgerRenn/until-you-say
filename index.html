@@ -10,7 +10,7 @@
     <title>Until You Say · Zeit für einen Moment</title>
     <link rel="icon" href="./icon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="./style.css">
-    <script src="./app.js?v=3" defer></script>
+    <script src="./app.js?v=4" defer></script>
   </head>
   <body>
     <main class="shell">
@@ -25,7 +25,7 @@
 
         <section id="timer-view" hidden>
           <p class="eyebrow">Jeder Moment zählt</p>
-          <h1 id="headline"></h1>
+          <h1>Du bestimmst, wann ich darf. 😇</h1>
           <div class="ornament" aria-hidden="true"><span></span><i>✧</i><span></span></div>
 
           <div class="clock" role="timer" aria-label="Zeit seit dem Start">
@@ -40,14 +40,7 @@
 
           <p class="since">Seit <time id="start-time"></time></p>
 
-          <div class="checkpoint" id="checkpoint">
-            <div class="checkpoint-top"><span class="checkpoint-icon" aria-hidden="true">◇</span><span>PRÜFPUNKT</span></div>
-            <p class="checkpoint-label" id="checkpoint-label"></p>
-            <strong class="checkpoint-value" id="checkpoint-value"></strong>
-            <p class="checkpoint-date"><time id="checkpoint-time"></time></p>
-          </div>
-
-          <p class="status"><span class="status-dot" aria-hidden="true"></span><span id="status-text"></span></p>
+          <p class="status"><span class="status-dot" aria-hidden="true"></span><span>Ich warte. 😏</span></p>
           <button class="share" type="button" id="share-button">Link kopieren <span aria-hidden="true">↗</span></button>
         </section>
 
