@@ -45,7 +45,7 @@
 
   function durationText(total) {
     const { days, hours, minutes, seconds } = partsOf(total);
-    return `${days} ${days === 1 ? "Tag" : "Tage"} · ${two(hours)} ${hours === 1 ? "Stunde" : "Stunden"} · ${two(minutes)} ${minutes === 1 ? "Minute" : "Minuten"} · ${two(seconds)} ${seconds === 1 ? "Sekunde" : "Sekunden"}`;
+    return `${days} ${days === 1 ? "Tag" : "Tage"} · ${two(hours)} Std · ${two(minutes)} Min · ${two(seconds)} Sek`;
   }
 
   function renderHistory(phases) {
