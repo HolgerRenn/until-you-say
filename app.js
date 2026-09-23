@@ -54,6 +54,9 @@
     list.replaceChildren();
     history.hidden = phases.length < 2;
     if (history.hidden) return;
+    $("history-title").textContent = phases.length === 2
+      ? "Abgeschlossene Enthaltsamkeit"
+      : "Abgeschlossene Enthaltsamkeiten";
     phases.slice(0, -1).forEach((phase, index) => {
       const entry = document.createElement("div");
       const label = document.createElement("p");
