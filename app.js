@@ -1,4 +1,4 @@
-/* Phase times live only in the URL fragment. No network or storage. */
+/* Timeline data lives in timestamps.js. No network or storage. */
 (() => {
   const $ = (id) => document.getElementById(id);
   const two = (value) => String(value).padStart(2, "0");
@@ -13,14 +13,21 @@
   let ticker;
   let sortMode = "newest";
 
-  function parsePhases(fragment) {
-    const parts = fragment.split("~");
-    if (parts.length > 20 || parts.some((part) => !/^[0-9a-z]{1,9}$/.test(part))) return null;
-    const boundaries = parts.map((part) => parseInt(part, 36) * 1000);
-    if (boundaries.some((instant) => !withinRange(instant))) return null;
+  function parsePhases() {
+    if (typeof timestamps === "undefined" || !Array.isArray(timestamps) ||
+        timestamps.length === 0 || timestamps.length > 20) return null;
+
+    const boundaries = timestamps.map((value) => {
+      if (typeof value !== "string") return NaN;
+      const instant = Date.parse(value);
+      return withinRange(instant) ? instant : NaN;
+    });
+    if (boundaries.some((instant) => !Number.isSafeInteger(instant))) return null;
+
     for (let i = 1; i < boundaries.length; i++) {
       if (boundaries[i] <= boundaries[i - 1]) return null;
     }
+
     return boundaries.map((start, index) => ({
       start,
       end: index + 1 < boundaries.length ? boundaries[index + 1] : null
@@ -82,7 +89,7 @@
 
   function render() {
     clearInterval(ticker);
-    const phases = parsePhases(location.hash.slice(1));
+    const phases = parsePhases();
     $("timer-view").hidden = !phases;
     if (!phases) return;
 
@@ -133,7 +140,6 @@
     if (expanded || phase.end === null || Date.now() < phase.end) ticker = setInterval(tick, 1000);
   }
 
-  window.addEventListener("hashchange", render);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });
   $("sort-newest").addEventListener("click", () => { sortMode = "newest"; render(); });
   $("sort-longest").addEventListener("click", () => { sortMode = "longest"; render(); });
