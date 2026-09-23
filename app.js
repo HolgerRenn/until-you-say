@@ -48,20 +48,22 @@
     return `${days} ${days === 1 ? "Tag" : "Tage"} · ${two(hours)} Std · ${two(minutes)} Min · ${two(seconds)} Sek`;
   }
 
-  function renderHistory(phases) {
+  function renderHistory(phases, expanded, now) {
     const history = $("history");
     const list = $("history-list");
     list.replaceChildren();
-    history.hidden = phases.length < 2;
+    const completed = phases.map((phase, index) => ({ ...phase, index }))
+      .filter((phase) => phase.end !== null && phase.end <= now);
+    history.hidden = !expanded || completed.length === 0;
     if (history.hidden) return;
-    $("history-title").textContent = phases.length === 2
+    $("history-title").textContent = completed.length === 1
       ? "Abgeschlossene Enthaltsamkeit"
       : "Abgeschlossene Enthaltsamkeiten";
-    phases.slice(0, -1).forEach((phase, index) => {
+    completed.forEach((phase) => {
       const entry = document.createElement("div");
       const label = document.createElement("p");
       label.className = "phase-label";
-      label.textContent = `Phase ${two(index + 1)}`;
+      label.textContent = `Phase ${two(phase.index + 1)}`;
       entry.append(label);
       for (const [prefix, instant] of [["Von:", phase.start], ["Bis:", phase.end]]) {
         const line = document.createElement("p");
@@ -82,15 +84,32 @@
     if (!phases) return;
 
     const phase = phases[phases.length - 1];
+    const expanded = phases.length > 1;
+    const now = Date.now();
+    const complete = phase.end !== null && now >= phase.end;
+    $("overall").hidden = !expanded;
+    $("current-phase").hidden = expanded && complete;
+    if (expanded) {
+      $("overall-start").dateTime = new Date(phases[0].start).toISOString();
+      $("overall-start").textContent = formatted(phases[0].start);
+    }
     const label = $("phase-label");
-    label.hidden = phases.length === 1;
-    label.textContent = phases.length > 1 ? `Phase ${two(phases.length)}` : "";
+    label.hidden = !expanded;
+    label.textContent = expanded ? `Aktuelle Enthaltsamkeit · Phase ${two(phases.length)}` : "";
     $("start-time").dateTime = new Date(phase.start).toISOString();
     $("start-time").textContent = formatted(phase.start);
-    renderHistory(phases);
+    renderHistory(phases, expanded, now);
 
     function tick() {
       const complete = phase.end !== null && Date.now() >= phase.end;
+      if (expanded) {
+        const overallSeconds = Math.floor(Math.max(0, Date.now() - phases[0].start) / 1000);
+        $("overall-duration").textContent = durationText(overallSeconds);
+        if (complete && !$("current-phase").hidden) {
+          render();
+          return;
+        }
+      }
       const total = Math.floor(Math.max(0, (complete ? phase.end : Date.now()) - phase.start) / 1000);
       const { days, hours, minutes, seconds } = partsOf(total);
       $("days").textContent = days;
@@ -104,11 +123,11 @@
         $("end-time").dateTime = new Date(phase.end).toISOString();
         $("end-time").textContent = formatted(phase.end);
         $("duration").textContent = durationText((phase.end - phase.start) / 1000);
-        clearInterval(ticker);
+        if (!expanded) clearInterval(ticker);
       }
     }
     tick();
-    if (phase.end === null || Date.now() < phase.end) ticker = setInterval(tick, 1000);
+    if (expanded || phase.end === null || Date.now() < phase.end) ticker = setInterval(tick, 1000);
   }
 
   window.addEventListener("hashchange", render);

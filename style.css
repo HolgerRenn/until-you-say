@@ -10,7 +10,13 @@ body { margin: 0; min-width: 320px; min-height: 100svh; color: #f7edf4; }
 .masthead { display: flex; align-items: center; justify-content: center; gap: 15px; color: #ddbac7; }
 .brand { font-size: 10px; font-weight: 750; letter-spacing: .33em; white-space: nowrap; }
 .mark { font-size: 12px; color: #d7a7b6; }
+.overall { margin: 32px 0 0; padding: 0 0 24px; border-bottom: 1px solid rgba(244, 207, 220, .15); }
+.overall-title { margin: 0; color: #ddbac7; font-size: 10px; font-weight: 750; letter-spacing: .2em; }
+.overall-duration { margin: 13px 0 0; color: #f3dce7; font-size: clamp(14px, 3.8vw, 17px); line-height: 1.5; font-variant-numeric: tabular-nums; text-wrap: balance; }
+.overall-since { margin: 8px 0 0; color: #b7a6b8; font-size: 11px; }
+.overall-since time { color: #e7cad7; }
 h1 { margin: 54px auto 0; max-width: 360px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(30px, 8vw, 41px); line-height: 1.15; font-weight: 400; letter-spacing: -.025em; text-wrap: balance; }
+.overall:not([hidden]) + #current-phase h1 { margin-top: 38px; }
 .phase-label { margin: 25px 0 -10px; color: #ddbac7; font-size: 10px; font-weight: 750; letter-spacing: .16em; }
 .ornament { display: flex; align-items: center; justify-content: center; gap: 13px; margin: 27px auto 31px; color: #dea9bc; }
 .ornament span { width: 53px; height: 1px; background: linear-gradient(90deg, transparent, #a5758a); }
