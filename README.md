@@ -1,7 +1,7 @@
 # Until You Say
 
-A small static count-up page. It counts continuously from a start instant and has no end date or checkpoint.
+A small static elapsed-time page. It can show one running interval or a series of intervals. An interval with an end time stops at its exact duration. Numbering appears only when the link contains more than one interval.
 
-The page has no analytics, external assets, backend, cookies, or local storage. The link format is `#` followed by the start instant as base-36 Unix seconds. Displayed phrases are fixed in the public source. URL fragments are not part of the HTTP request to GitHub Pages. Anyone who has the complete link can read and share its start time; a fragment is not encryption.
+The page has no analytics, external assets, backend, cookies, or local storage. Displayed phrases are fixed in the public source. Dates and times live in the URL fragment, which is not part of the HTTP request to GitHub Pages. Anyone with the complete link can decode and share the times; the fragment is not encryption.
 
-Convert the Unix timestamp in seconds to base 36 and append it directly after `#`. Dates display in `Europe/Berlin`. The page is neutral when opened without a valid fragment.
+The fragment contains a start instant in base-36 Unix seconds, optionally followed by `.` and an end instant. Additional intervals are separated with `~`, in chronological order. For example, `#<start>.<end>` shows one interval, while `#<start>.<end>~<start>` shows a completed interval and an ongoing one. Dates display in `Europe/Berlin`. A link with only `#<start>` retains the original continuous counter. The page is neutral without a valid fragment.

@@ -14,8 +14,8 @@
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <link rel="icon" href="./icon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="./style.css?v=7">
-    <script src="./app.js?v=5" defer></script>
+    <link rel="stylesheet" href="./style.css?v=8">
+    <script src="./app.js?v=6" defer></script>
   </head>
   <body>
     <main class="shell">
@@ -30,6 +30,7 @@
 
         <section id="timer-view" hidden>
           <h1>Du bestimmst, wann ich darf. 😇</h1>
+          <p class="phase-label" id="phase-label" hidden></p>
           <div class="ornament" aria-hidden="true"><span></span><i>✧</i><span></span></div>
 
           <div class="clock" role="timer" aria-label="Zeit seit dem Start">
@@ -42,8 +43,14 @@
             <div class="clock-unit"><strong id="seconds">00</strong><span>Sekunden</span></div>
           </div>
 
-          <p class="since">Seit <time id="start-time"></time></p>
+          <p class="since"><span id="start-label">Seit</span> <time id="start-time"></time></p>
+          <p class="since" id="end-line" hidden>Bis <time id="end-time"></time></p>
+          <p class="duration" id="duration-line" hidden>Dauer: <span id="duration"></span></p>
           <p class="closing">DU LEIDEST JA NICHT 😉</p>
+          <section class="history" id="history" hidden>
+            <h2>Abgeschlossene Enthaltsamkeit</h2>
+            <div id="history-list"></div>
+          </section>
         </section>
       </article>
     </main>
