@@ -86,23 +86,13 @@
 
   function render() {
     clearInterval(ticker);
-    const segments = location.hash.slice(1).split("!");
-    const phases = segments.length <= 2 ? parsePhases(segments[0]) : null;
-    const previewAt = segments.length === 2 && /^[0-9a-z]{1,9}$/.test(segments[1])
-      ? parseInt(segments[1], 36) * 1000 : null;
-    const valid = phases && (segments.length === 1 || withinRange(previewAt));
-    $("timer-view").hidden = !valid;
-    if (!valid) return;
-    $("preview-note").hidden = previewAt === null;
-    if (previewAt !== null) {
-      $("preview-time").dateTime = new Date(previewAt).toISOString();
-      $("preview-time").textContent = formatted(previewAt);
-    }
-    const nowForView = () => previewAt === null ? Date.now() : previewAt;
+    const phases = parsePhases(location.hash.slice(1));
+    $("timer-view").hidden = !phases;
+    if (!phases) return;
 
     const phase = phases[phases.length - 1];
     const expanded = phases.length > 1;
-    const now = nowForView();
+    const now = Date.now();
     const complete = phase.end !== null && now >= phase.end;
     $("overall").hidden = !expanded;
     $("current-phase").hidden = expanded && complete;
@@ -118,17 +108,16 @@
     renderHistory(phases, expanded, now);
 
     function tick() {
-      const currentNow = nowForView();
-      const complete = phase.end !== null && currentNow >= phase.end;
+      const complete = phase.end !== null && Date.now() >= phase.end;
       if (expanded) {
-        const overallSeconds = Math.floor(Math.max(0, currentNow - phases[0].start) / 1000);
+        const overallSeconds = Math.floor(Math.max(0, Date.now() - phases[0].start) / 1000);
         $("overall-duration").textContent = durationText(overallSeconds);
         if (complete && !$("current-phase").hidden) {
           render();
           return;
         }
       }
-      const total = Math.floor(Math.max(0, (complete ? phase.end : currentNow) - phase.start) / 1000);
+      const total = Math.floor(Math.max(0, (complete ? phase.end : Date.now()) - phase.start) / 1000);
       const { days, hours, minutes, seconds } = partsOf(total);
       $("days").textContent = days;
       $("hours").textContent = two(hours);
@@ -145,9 +134,7 @@
       }
     }
     tick();
-    if (previewAt === null && (expanded || phase.end === null || Date.now() < phase.end)) {
-      ticker = setInterval(tick, 1000);
-    }
+    if (expanded || phase.end === null || Date.now() < phase.end) ticker = setInterval(tick, 1000);
   }
 
   window.addEventListener("hashchange", render);
