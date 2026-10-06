@@ -2,42 +2,42 @@
 
 A small static elapsed-time page with one fixed GitHub Pages URL. The complete timeline is maintained in `timestamps.js`; no timing data is stored in the URL.
 
-The timeline separates the original abstinence start, Denise's release, and Holger's actual usage. Abstinence continues after a release and ends only when the release is actually used. That usage timestamp also becomes the start of the next abstinence phase automatically.
+The page always shows the currently running abstinence phase. Release timestamps are not used as a live state on the page. A release is added only after it has actually been used, so every historical entry contains both the release timestamp and the usage timestamp.
 
 Edit only `timestamps.js` to maintain the timeline:
 
 ```js
 const timeline = {
   start: "2026-09-22T21:23:00+02:00",
-  releases: [
-    // { released: "2026-10-10T14:00:00+02:00", used: null }
+  history: [
+    // {
+    //   released: "2026-10-10T14:00:00+02:00",
+    //   used: "2026-10-10T19:30:00+02:00"
+    // }
   ]
 };
 ```
 
-When a release happens, append an entry with its `released` timestamp and `used: null`:
+For every completed release/use event, append one complete history entry:
 
 ```js
-{ released: "2026-10-10T14:00:00+02:00", used: null }
+{
+  released: "2026-10-10T14:00:00+02:00",
+  used: "2026-10-10T19:30:00+02:00"
+}
 ```
 
-The current timer keeps running from the phase start and the page shows that the release is available but not yet used.
+The abstinence phase continues through the release and ends only at the usage timestamp. The usage timestamp automatically becomes the start of the next running abstinence phase.
 
-After the release is actually used, replace `null` with the usage timestamp:
-
-```js
-{ released: "2026-10-10T14:00:00+02:00", used: "2026-10-10T19:30:00+02:00" }
-```
-
-The completed phase then runs from its start until the usage timestamp. The history shows:
+The history shows for every completed phase:
 
 - phase start
 - release timestamp
 - usage timestamp
-- total abstinence duration
-- elapsed time between release and usage
+- total abstinence duration from phase start to usage
+- elapsed time from release to usage
 
-The next abstinence phase starts automatically at the usage timestamp. After at least one completed phase, the page also shows the overall “SEIT DU BESTIMMST” timer and the phase history. Completed phases can be sorted by newest or longest; newest is the default.
+After at least one completed phase, the page also shows the overall “SEIT DU BESTIMMST” timer. Completed phases can be sorted by newest or longest; newest is the default.
 
 All timestamps must be valid ISO timestamps and chronological. Dates display in `Europe/Berlin`.
 
