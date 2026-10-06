@@ -9,16 +9,20 @@ Edit only `timestamps.js` to maintain the timeline:
 ```js
 const timeline = {
   start: "2026-09-22T21:23:00+02:00",
-  history: [
-    {
-      released: "2026-10-03T20:30:00+02:00",
-      used: "2026-10-03T21:22:00+02:00"
-    }
-  ]
+  history: []
 };
 ```
 
-For every completed release/use event, append one complete history entry. The abstinence phase continues through the release and ends only at the usage timestamp. That usage timestamp automatically becomes the start of the next running abstinence phase.
+For every completed release/use event, append one complete history entry:
+
+```js
+{
+  released: "YYYY-MM-DDTHH:mm:ss+02:00",
+  used: "YYYY-MM-DDTHH:mm:ss+02:00"
+}
+```
+
+The abstinence phase continues through the release and ends only at the usage timestamp. That usage timestamp automatically becomes the start of the next running abstinence phase.
 
 Each historical phase displays:
 
@@ -27,7 +31,7 @@ Each historical phase displays:
 - Nutzung
 - Enthaltsamkeit from phase start to usage, shown in days, hours, and minutes
 
-The current phase itself keeps the original live seconds counter. Completed phases can be sorted by newest or longest; newest is the default.
+The overall timer is intentionally the total runtime of UNTIL YOU SAY since the original start, independent of releases or usage. The current phase keeps the live seconds counter. Completed phases can be sorted by newest or longest; newest is the default.
 
 Visit email notification is temporarily disabled while the page is being finalized.
 
