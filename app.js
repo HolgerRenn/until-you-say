@@ -19,36 +19,34 @@
     return withinRange(instant) ? instant : NaN;
   }
 
-  function parsePhases() {
+  function parseTimeline() {
     if (typeof timeline === "undefined" || !timeline || typeof timeline !== "object") return null;
-    if (!Array.isArray(timeline.releases) || timeline.releases.length > 50) return null;
+    if (!Array.isArray(timeline.history) || timeline.history.length > 50) return null;
 
     const originalStart = parseInstant(timeline.start);
     if (!Number.isSafeInteger(originalStart)) return null;
 
-    const phases = [];
+    const completed = [];
     let phaseStart = originalStart;
 
-    for (let index = 0; index < timeline.releases.length; index++) {
-      const event = timeline.releases[index];
+    for (const event of timeline.history) {
       if (!event || typeof event !== "object") return null;
 
       const released = parseInstant(event.released);
-      const used = event.used === null ? null : parseInstant(event.used);
-      if (!Number.isSafeInteger(released) || released <= phaseStart) return null;
-      if (used !== null && (!Number.isSafeInteger(used) || used < released)) return null;
+      const used = parseInstant(event.used);
 
-      phases.push({ start: phaseStart, released, used });
+      if (!Number.isSafeInteger(released) || !Number.isSafeInteger(used)) return null;
+      if (released <= phaseStart || used < released) return null;
 
-      if (used === null) {
-        if (index !== timeline.releases.length - 1) return null;
-        return phases;
-      }
+      completed.push({ start: phaseStart, released, used });
       phaseStart = used;
     }
 
-    phases.push({ start: phaseStart, released: null, used: null });
-    return phases;
+    return {
+      originalStart,
+      completed,
+      currentStart: phaseStart
+    };
   }
 
   function formatted(instant) {
@@ -75,14 +73,13 @@
     entry.append(line);
   }
 
-  function renderHistory(phases, expanded, now) {
+  function renderHistory(completed) {
     const history = $("history");
     const list = $("history-list");
     list.replaceChildren();
-    const completed = phases.map((phase, index) => ({ ...phase, index }))
-      .filter((phase) => phase.used !== null && phase.used <= now);
-    history.hidden = !expanded || completed.length === 0;
-    $("history-sort").hidden = !expanded || completed.length < 2;
+
+    history.hidden = completed.length === 0;
+    $("history-sort").hidden = completed.length < 2;
     if (history.hidden) return;
 
     $("history-title").textContent = completed.length === 1
@@ -90,11 +87,14 @@
       : "Abgeschlossene Enthaltsamkeiten";
     $("sort-newest").setAttribute("aria-pressed", String(sortMode === "newest"));
     $("sort-longest").setAttribute("aria-pressed", String(sortMode === "longest"));
-    completed.sort(sortMode === "longest"
-      ? (a, b) => (b.used - b.start) - (a.used - a.start) || b.used - a.used
-      : (a, b) => b.used - a.used);
 
-    completed.forEach((phase) => {
+    const sorted = completed
+      .map((phase, index) => ({ ...phase, index }))
+      .sort(sortMode === "longest"
+        ? (a, b) => (b.used - b.start) - (a.used - a.start) || b.used - a.used
+        : (a, b) => b.used - a.used);
+
+    sorted.forEach((phase) => {
       const entry = document.createElement("div");
       const label = document.createElement("p");
       label.className = "phase-label";
@@ -112,60 +112,49 @@
 
       const afterRelease = document.createElement("p");
       afterRelease.className = "history-secondary";
-      afterRelease.textContent = `Nach Freigabe genutzt nach: ${durationText((phase.used - phase.released) / 1000)}`;
+      afterRelease.textContent = `Freigabe bis Nutzung: ${durationText((phase.used - phase.released) / 1000)}`;
       entry.append(afterRelease);
+
       list.append(entry);
     });
   }
 
   function render() {
     clearInterval(ticker);
-    const phases = parsePhases();
-    $("timer-view").hidden = !phases;
-    if (!phases) return;
+    const data = parseTimeline();
+    $("timer-view").hidden = !data;
+    if (!data) return;
 
-    const phase = phases[phases.length - 1];
-    const expanded = phases.length > 1;
-    const now = Date.now();
-    const released = phase.released !== null && phase.released <= now;
-
+    const expanded = data.completed.length > 0;
     $("overall").hidden = !expanded;
-    $("current-phase").hidden = false;
+
     if (expanded) {
-      $("overall-start").dateTime = new Date(phases[0].start).toISOString();
-      $("overall-start").textContent = formatted(phases[0].start);
+      $("overall-start").dateTime = new Date(data.originalStart).toISOString();
+      $("overall-start").textContent = formatted(data.originalStart);
     }
 
+    const phaseNumber = data.completed.length + 1;
     const label = $("phase-label");
     label.hidden = !expanded;
-    label.textContent = expanded ? `Aktuelle Enthaltsamkeit · Phase ${two(phases.length)}` : "";
-    $("start-time").dateTime = new Date(phase.start).toISOString();
-    $("start-time").textContent = formatted(phase.start);
+    label.textContent = expanded ? `Aktuelle Enthaltsamkeit · Phase ${two(phaseNumber)}` : "";
 
-    $("headline").textContent = released
-      ? "Du hast gesagt, ich darf. 😇"
-      : "Du bestimmst, wann ich darf. 😇";
-    $("release-status").hidden = !released;
-    if (released) {
-      $("release-time").dateTime = new Date(phase.released).toISOString();
-      $("release-time").textContent = formatted(phase.released);
-    }
-    $("closing").textContent = released
-      ? "FREIGEGEBEN. NOCH NICHT GENUTZT 😉"
-      : "DU LEIDEST JA NICHT 😉";
+    $("start-time").dateTime = new Date(data.currentStart).toISOString();
+    $("start-time").textContent = formatted(data.currentStart);
 
-    renderHistory(phases, expanded, now);
+    renderHistory(data.completed);
 
     function tick() {
-      const total = Math.floor(Math.max(0, Date.now() - phase.start) / 1000);
-      const { days, hours, minutes, seconds } = partsOf(total);
+      const now = Date.now();
+      const currentSeconds = Math.floor(Math.max(0, now - data.currentStart) / 1000);
+      const { days, hours, minutes, seconds } = partsOf(currentSeconds);
+
       $("days").textContent = days;
       $("hours").textContent = two(hours);
       $("minutes").textContent = two(minutes);
       $("seconds").textContent = two(seconds);
 
       if (expanded) {
-        const overallSeconds = Math.floor(Math.max(0, Date.now() - phases[0].start) / 1000);
+        const overallSeconds = Math.floor(Math.max(0, now - data.originalStart) / 1000);
         $("overall-duration").textContent = durationText(overallSeconds);
       }
     }
