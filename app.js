@@ -43,7 +43,6 @@
     }
 
     return {
-      originalStart,
       completed,
       currentStart: phaseStart
     };
@@ -62,9 +61,9 @@
     };
   }
 
-  function durationText(total) {
-    const { days, hours, minutes, seconds } = partsOf(total);
-    return `${days} ${days === 1 ? "Tag" : "Tage"} · ${two(hours)} Std · ${two(minutes)} Min · ${two(seconds)} Sek`;
+  function historyDurationText(total) {
+    const { days, hours, minutes } = partsOf(total);
+    return `${days} ${days === 1 ? "Tag" : "Tage"} · ${two(hours)} Std · ${two(minutes)} Min`;
   }
 
   function appendHistoryLine(entry, prefix, instant) {
@@ -101,19 +100,14 @@
       label.textContent = `Phase ${two(phase.index + 1)}`;
       entry.append(label);
 
-      appendHistoryLine(entry, "Von:", phase.start);
+      appendHistoryLine(entry, "Start:", phase.start);
       appendHistoryLine(entry, "Freigabe:", phase.released);
       appendHistoryLine(entry, "Nutzung:", phase.used);
 
       const duration = document.createElement("p");
       duration.className = "history-duration";
-      duration.textContent = `Enthaltsam: ${durationText((phase.used - phase.start) / 1000)}`;
+      duration.textContent = `Enthaltsamkeit: ${historyDurationText((phase.used - phase.start) / 1000)}`;
       entry.append(duration);
-
-      const afterRelease = document.createElement("p");
-      afterRelease.className = "history-secondary";
-      afterRelease.textContent = `Freigabe bis Nutzung: ${durationText((phase.used - phase.released) / 1000)}`;
-      entry.append(afterRelease);
 
       list.append(entry);
     });
@@ -126,13 +120,6 @@
     if (!data) return;
 
     const expanded = data.completed.length > 0;
-    $("overall").hidden = !expanded;
-
-    if (expanded) {
-      $("overall-start").dateTime = new Date(data.originalStart).toISOString();
-      $("overall-start").textContent = formatted(data.originalStart);
-    }
-
     const phaseNumber = data.completed.length + 1;
     const label = $("phase-label");
     label.hidden = !expanded;
@@ -152,11 +139,6 @@
       $("hours").textContent = two(hours);
       $("minutes").textContent = two(minutes);
       $("seconds").textContent = two(seconds);
-
-      if (expanded) {
-        const overallSeconds = Math.floor(Math.max(0, now - data.originalStart) / 1000);
-        $("overall-duration").textContent = durationText(overallSeconds);
-      }
     }
 
     tick();
