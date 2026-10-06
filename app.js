@@ -43,6 +43,7 @@
     }
 
     return {
+      originalStart,
       completed,
       currentStart: phaseStart
     };
@@ -59,6 +60,11 @@
       minutes: Math.floor(total / 60) % 60,
       seconds: total % 60
     };
+  }
+
+  function overallDurationText(total) {
+    const { days, hours, minutes, seconds } = partsOf(total);
+    return `${days} ${days === 1 ? "Tag" : "Tage"} · ${two(hours)} Std · ${two(minutes)} Min · ${two(seconds)} Sek`;
   }
 
   function historyDurationText(total) {
@@ -120,6 +126,13 @@
     if (!data) return;
 
     const expanded = data.completed.length > 0;
+    $("overall").hidden = !expanded;
+
+    if (expanded) {
+      $("overall-start").dateTime = new Date(data.originalStart).toISOString();
+      $("overall-start").textContent = formatted(data.originalStart);
+    }
+
     const phaseNumber = data.completed.length + 1;
     const label = $("phase-label");
     label.hidden = !expanded;
@@ -139,6 +152,11 @@
       $("hours").textContent = two(hours);
       $("minutes").textContent = two(minutes);
       $("seconds").textContent = two(seconds);
+
+      if (expanded) {
+        const overallSeconds = Math.floor(Math.max(0, now - data.originalStart) / 1000);
+        $("overall-duration").textContent = overallDurationText(overallSeconds);
+      }
     }
 
     tick();
