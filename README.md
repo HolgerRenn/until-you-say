@@ -33,8 +33,8 @@ Each historical phase displays:
 
 The overall timer is intentionally the total runtime of UNTIL YOU SAY since the original start, independent of releases or usage. The current phase keeps the live seconds counter. Completed phases can be sorted by newest or longest; newest is the default.
 
-Visit email notification is temporarily disabled while the page is being finalized.
+Visit email notification is active. It sends once per browser session and reports the visit timestamp plus the total runtime counter.
 
 All timestamps must be valid ISO timestamps and chronological. Dates display in `Europe/Berlin`.
 
-The page has no active analytics, backend, cookies, or local storage. It is marked `noindex, nofollow, noarchive`. The repository is public, so timestamps stored in `timestamps.js` are publicly readable.
+The page has no analytics or backend of its own. It is marked `noindex, nofollow, noarchive`. The repository is public, so timestamps stored in `timestamps.js` are publicly readable.
