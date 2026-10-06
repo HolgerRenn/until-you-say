@@ -29,13 +29,7 @@ h1 { margin: 54px auto 0; max-width: 360px; font-family: Georgia, "Times New Rom
 .clock-separator { padding-top: 3px; color: #b88b9d; font-size: clamp(25px, 7vw, 38px); font-weight: 200; line-height: 1; }
 .since { margin: 24px 0 0; color: #c7b4c3; font-size: 12px; }
 .since time { color: #f3dce7; font-weight: 600; }
-.release-status { margin: 24px auto 0; padding: 14px 16px 13px; max-width: 330px; border: 1px solid rgba(244, 207, 220, .22); border-radius: 16px; background: rgba(244, 207, 220, .07); }
-.release-status-label { display: inline-block; color: #f3dce7; font-size: 10px; font-weight: 750; letter-spacing: .18em; }
-.release-status p { margin: 8px 0 0; color: #c7b4c3; font-size: 12px; line-height: 1.45; }
-.release-status time { color: #f3dce7; font-weight: 600; }
-.release-status .release-status-note { margin-top: 5px; color: #b7a6b8; font-size: 11px; }
 .closing { margin: 48px 0 0; color: #f3d7df; font-size: clamp(15px, 4vw, 17px); font-weight: 650; letter-spacing: .09em; line-height: 1.45; }
-.release-status:not([hidden]) + .closing { margin-top: 30px; }
 .history { margin-top: 44px; border-top: 1px solid rgba(244, 207, 220, .19); text-align: left; }
 .history h2 { margin: 25px 0 0; color: #ddbac7; font-size: 12px; font-weight: 650; letter-spacing: .06em; }
 .history-sort { display: flex; gap: 8px; margin: 16px 0 0; }
