@@ -43,3 +43,6 @@ h1 span { display: block; margin-top: 12px; }
 .closing { margin: 34px 0 0; padding-top: 29px; border-top: 1px solid rgba(244, 207, 220, .19); color: #f3d7df; font-size: clamp(15px, 4vw, 17px); font-weight: 650; letter-spacing: .09em; line-height: 1.45; }
 [hidden] { display: none !important; }
 @media (min-width: 600px) { .card { padding-top: 38px; padding-bottom: 45px; } }
+
+/* Mobile: visually lift the card by about 60px while keeping long phases scrollable. */
+@media (max-width: 599px) { .shell { padding-bottom: max(142px, env(safe-area-inset-bottom)); } }
