@@ -10,8 +10,8 @@ body { margin: 0; min-width: 320px; min-height: 100svh; color: #f7edf4; }
 .masthead { display: flex; align-items: center; justify-content: center; gap: 15px; color: #ddbac7; }
 .brand { font-size: 10px; font-weight: 750; letter-spacing: .33em; white-space: nowrap; }
 .mark { font-size: 12px; color: #d7a7b6; }
-h1 { margin: 38px auto 0; max-width: 390px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(24px, 6.7vw, 32px); line-height: 1.22; font-weight: 400; letter-spacing: -.02em; text-wrap: balance; }
-h1 span { display: block; margin-top: 5px; }
+h1 { margin: 36px auto 0; padding-top: 38px; border-top: 1px solid rgba(244, 207, 220, .19); max-width: 390px; font-size: clamp(19px, 5vw, 22px); line-height: 1.45; font-weight: 500; letter-spacing: -.02em; text-wrap: balance; }
+h1 span { display: block; margin-top: 12px; }
 .phase-label { margin: 18px 0 0; color: #cba8bd; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .ornament { display: flex; align-items: center; justify-content: center; gap: 13px; margin: 27px auto 17px; color: #dea9bc; }
 .ornament span { width: 53px; height: 1px; background: linear-gradient(90deg, transparent, #a5758a); }
