@@ -49,9 +49,14 @@
     return `${days} ${days === 1 ? "Tag" : "Tage"} · ${two(hours)} Std · ${two(minutes)} Min`;
   }
 
-  function appendHistoryLine(entry, prefix, instant) {
+  function appendHistoryLine(entry, prefix, instant, symbol) {
     const line = document.createElement("p");
     line.className = "history-line";
+
+    const icon = document.createElement("span");
+    icon.className = "history-line-icon";
+    icon.setAttribute("aria-hidden", "true");
+    icon.textContent = symbol;
 
     const label = document.createElement("strong");
     label.textContent = prefix;
@@ -59,7 +64,7 @@
     const value = document.createElement("span");
     value.textContent = formatted(instant);
 
-    line.append(label, value);
+    line.append(icon, label, value);
     entry.append(line);
   }
 
@@ -89,9 +94,9 @@
       label.textContent = `ENTHALTSAMKEIT ${two(phase.index + 1)}`;
       entry.append(label);
 
-      appendHistoryLine(entry, "Start:", phase.start);
-      appendHistoryLine(entry, "Freigabe:", phase.released);
-      appendHistoryLine(entry, "Nutzung:", phase.used);
+      appendHistoryLine(entry, "Start:", phase.start, "▷");
+      appendHistoryLine(entry, "Freigabe:", phase.released, "⚑");
+      appendHistoryLine(entry, "Nutzung:", phase.used, "♡");
 
       const duration = document.createElement("p");
       duration.className = "history-duration";
