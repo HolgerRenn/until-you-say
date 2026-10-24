@@ -150,7 +150,7 @@ h1 span { display: block; margin-top: 12px; }
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
-.history .history .history-duration {
+.history .history-duration {
   display: grid;
   grid-template-columns: 22px 1fr;
   column-gap: 10px;
