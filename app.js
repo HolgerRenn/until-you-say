@@ -49,13 +49,45 @@
     return `${days} ${days === 1 ? "Tag" : "Tage"} · ${two(hours)} Std · ${two(minutes)} Min`;
   }
 
+  function makeIcon(kind, className) {
+    const ns = "http://www.w3.org/2000/svg";
+    const span = document.createElement("span");
+    span.className = className;
+    span.setAttribute("aria-hidden", "true");
+
+    const svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("focusable", "false");
+
+    const addPath = (d) => {
+      const path = document.createElementNS(ns, "path");
+      path.setAttribute("d", d);
+      svg.append(path);
+    };
+
+    if (kind === "start") {
+      addPath("M8 5v14l11-7z");
+    } else if (kind === "release") {
+      addPath("M5 21V4");
+      addPath("M5 5h11l-2 4 2 4H5");
+    } else if (kind === "used") {
+      addPath("M20.8 4.6a5.4 5.4 0 0 0-7.6 0L12 5.8l-1.2-1.2a5.4 5.4 0 0 0-7.6 7.6L12 21l8.8-8.8a5.4 5.4 0 0 0 0-7.6z");
+    } else if (kind === "duration") {
+      addPath("M4 20V13");
+      addPath("M10 20V9");
+      addPath("M16 20V5");
+      addPath("M22 20H2");
+    }
+
+    span.append(svg);
+    return span;
+  }
+
   function appendHistoryLine(entry, prefix, instant, iconClass) {
     const line = document.createElement("p");
     line.className = "history-line";
 
-    const icon = document.createElement("span");
-    icon.className = `history-line-icon ${iconClass}`;
-    icon.setAttribute("aria-hidden", "true");
+    const icon = makeIcon(iconClass, "history-line-icon");
 
     const label = document.createElement("strong");
     label.textContent = prefix;
@@ -100,6 +132,8 @@
       const duration = document.createElement("p");
       duration.className = "history-duration";
 
+      const durationIcon = makeIcon("duration", "history-duration-icon");
+
       const durationLabel = document.createElement("span");
       durationLabel.className = "history-duration-label";
       durationLabel.textContent = "Dauer der Enthaltsamkeit";
@@ -108,7 +142,7 @@
       durationValue.className = "history-duration-value";
       durationValue.textContent = durationText(Math.floor((phase.used - phase.start) / 1000));
 
-      duration.append(durationLabel, durationValue);
+      duration.append(durationIcon, durationLabel, durationValue);
       entry.append(duration);
       list.append(entry);
     });
