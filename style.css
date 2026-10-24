@@ -125,16 +125,36 @@ h1 span { display: block; margin-top: 12px; }
 .history p { margin: 7px 0; }
 .history .history-line {
   display: grid;
-  grid-template-columns: 64px 1fr;
+  grid-template-columns: 24px 64px 1fr;
   gap: 8px;
-  align-items: baseline;
+  align-items: center;
+}
+.history-line-icon {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  color: #e99abd;
+  font-size: 17px;
+  line-height: 1;
 }
 .history .history-line strong { color: #f0dbe6; font-weight: 650; }
 .history .history-duration {
+  position: relative;
   margin: 15px 0 0;
-  padding-top: 13px;
+  padding: 13px 0 0 32px;
   border-top: 1px solid rgba(244, 207, 220, .13);
   color: #f3dce7;
+}
+.history-duration::before {
+  content: "▥";
+  position: absolute;
+  left: 0;
+  top: 15px;
+  color: #e99abd;
+  font-size: 22px;
+  line-height: 1;
+  transform: rotate(90deg);
 }
 .history-duration-label {
   display: block;
@@ -160,7 +180,7 @@ h1 span { display: block; margin-top: 12px; }
   .history-icon { width: 30px; height: 30px; font-size: 24px; }
   .history-toggle-text strong { font-size: 13px; }
   .history #history-list > div { padding-left: 39px; }
-  .history .history-line { grid-template-columns: 58px 1fr; gap: 6px; }
+  .history .history-line { grid-template-columns: 22px 58px 1fr; gap: 6px; }
 }
 
 /* Mobile: visually lift the card by about 60px while keeping long phases scrollable. */
