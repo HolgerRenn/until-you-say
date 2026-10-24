@@ -42,6 +42,14 @@
     return `${dateFormatter.format(instant)} · ${timeFormatter.format(instant)} Uhr`;
   }
 
+  function formattedDate(instant) {
+    return dateFormatter.format(instant);
+  }
+
+  function formattedTime(instant) {
+    return `${timeFormatter.format(instant)} Uhr`;
+  }
+
   function durationText(total) {
     const days = Math.floor(total / 86400);
     const hours = Math.floor(total / 3600) % 24;
@@ -92,10 +100,15 @@
     const label = document.createElement("strong");
     label.textContent = prefix;
 
-    const value = document.createElement("span");
-    value.textContent = formatted(instant);
+    const date = document.createElement("span");
+    date.className = "history-date";
+    date.textContent = formattedDate(instant);
 
-    line.append(icon, label, value);
+    const time = document.createElement("span");
+    time.className = "history-time";
+    time.textContent = formattedTime(instant);
+
+    line.append(icon, label, date, time);
     entry.append(line);
   }
 
