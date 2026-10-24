@@ -96,35 +96,14 @@ h1 span { display: block; margin-top: 12px; }
 .history-sort button[aria-pressed="true"] { border-color: rgba(231, 121, 170, .55); background: rgba(231, 121, 170, .11); color: #f7edf4; }
 
 .history #history-list > div {
-  position: relative;
-  padding: 15px 10px 12px 44px;
+  padding: 15px 6px 12px;
   color: #c7b4c3;
   font-size: 12px;
   line-height: 1.55;
 }
 .history #history-list > div + div { margin-top: 14px; border-top: 1px solid rgba(244, 207, 220, .12); }
-.history #history-list > div::before {
-  content: "";
-  position: absolute;
-  left: 15px;
-  top: 23px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #e78faf;
-  box-shadow: 0 0 12px rgba(231, 143, 175, .8);
-}
-.history #history-list > div::after {
-  content: "";
-  position: absolute;
-  left: 18px;
-  top: 42px;
-  bottom: 62px;
-  width: 1px;
-  background: linear-gradient(rgba(231, 143, 175, .45), rgba(231, 143, 175, .08));
-}
 .history .history-phase-label {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   color: #e5a8bf;
   font-size: 10px;
   font-weight: 750;
@@ -133,8 +112,8 @@ h1 span { display: block; margin-top: 12px; }
 .history p { margin: 7px 0; }
 .history .history-line {
   display: grid;
-  grid-template-columns: 20px 60px minmax(0, 1fr);
-  gap: 7px;
+  grid-template-columns: 18px 62px minmax(0, 1fr) auto;
+  column-gap: 7px;
   align-items: center;
 }
 .history-line-icon {
@@ -145,17 +124,23 @@ h1 span { display: block; margin-top: 12px; }
   color: #e99abd;
 }
 .history .history-line strong { color: #f0dbe6; font-weight: 650; white-space: nowrap; }
-.history .history-line > span:last-child {
+.history-date {
   min-width: 0;
   white-space: nowrap;
+  color: #c7b4c3;
+}
+.history-time {
+  white-space: nowrap;
+  text-align: right;
+  color: #e6d3df;
   font-variant-numeric: tabular-nums;
 }
 .history .history-duration {
   display: grid;
   grid-template-columns: 22px 1fr;
   column-gap: 10px;
-  margin: 15px 0 0;
-  padding-top: 13px;
+  margin: 16px 0 0;
+  padding: 14px 0 0;
   border-top: 1px solid rgba(244, 207, 220, .13);
   color: #f3dce7;
 }
@@ -189,8 +174,10 @@ h1 span { display: block; margin-top: 12px; }
   .history-toggle { grid-template-columns: 30px minmax(0, 1fr) 32px; gap: 9px; padding: 14px 12px; }
   .history-icon { width: 30px; height: 30px; font-size: 24px; }
   .history-toggle-text strong { font-size: 13px; }
-  .history #history-list > div { padding-left: 39px; }
-  .history .history-line { grid-template-columns: 18px 56px minmax(0, 1fr); gap: 6px; font-size: 11px; }
+  .history #history-list > div { padding-left: 2px; padding-right: 2px; }
+  .history .history-line { grid-template-columns: 16px 55px minmax(0, 1fr) auto; column-gap: 5px; font-size: 10.5px; }
+  .history-line-icon { width: 16px; height: 16px; }
+  .history-time { font-size: 10px; }
 }
 
 /* Mobile: visually lift the card by about 60px while keeping long phases scrollable. */
