@@ -115,15 +115,24 @@ h1 span { display: block; margin-top: 12px; }
   position: relative;
   margin-top: 38px;
   padding-top: 34px;
-  border-top: 2px solid rgba(231, 121, 170, .58);
+  border-top: 1px solid rgba(231, 121, 170, .52);
 }
 .control-entry + .control-entry::before {
   content: "";
   position: absolute;
-  top: -8px;
+  top: 4px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(231, 121, 170, .34);
+}
+.control-entry + .control-entry::after {
+  content: "";
+  position: absolute;
+  top: -6px;
   left: 50%;
-  width: 42px;
-  height: 14px;
+  width: 28px;
+  height: 16px;
   transform: translateX(-50%);
   background: #1d172c;
 }
