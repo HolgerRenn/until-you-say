@@ -124,7 +124,7 @@ h1 span { display: block; margin-top: 12px; }
   left: 0;
   right: 0;
   height: 1px;
-  background: rgba(231, 121, 170, .34);
+  background: rgba(231, 121, 170, .48);
 }
 .control-entry + .control-entry::after {
   content: "";
