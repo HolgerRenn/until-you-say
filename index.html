@@ -14,8 +14,8 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./style.css?v=33">
-  <script src="./app.js?v=28" defer></script>
+  <link rel="stylesheet" href="./style.css?v=34">
+  <script src="./app.js?v=29" defer></script>
   <script src="./visit-notification.js?v=2" defer></script>
 </head>
 <body>
@@ -24,9 +24,10 @@
     <div class="ambient ambient-two" aria-hidden="true"></div>
     <article class="card">
       <header class="masthead"><span class="mark" aria-hidden="true">✦</span><span class="brand">UNTIL YOU SAY</span><span class="mark" aria-hidden="true">✦</span></header>
+
       <section id="timer-view" hidden>
-        <div id="current-phase">
-          <p class="phase-label" id="phase-label" hidden></p>
+        <div id="running-view" hidden>
+          <p class="phase-label" id="phase-label"></p>
           <div class="ornament" aria-hidden="true"><span></span><i>✧</i><span></span></div>
           <div class="day-counter" role="timer" aria-label="Vollständig vergangene Tage ohne Orgasmus">
             <strong id="days">0</strong>
@@ -35,12 +36,29 @@
           <p class="since">Seit <time id="start-time"></time></p>
           <h1>Wann ich wieder darf? 🤷🏻‍♂️<span>Das entscheidest ganz alleine du. 😈</span></h1>
         </div>
+
+        <div id="ended-view" hidden>
+          <p class="phase-label ended-label">KONTROLLE BEENDET</p>
+          <div class="ornament" aria-hidden="true"><span></span><i>✧</i><span></span></div>
+          <section class="ended-summary">
+            <h1>✧ UNTER DEINER KONTROLLE ✧</h1>
+            <p class="ended-duration" id="ended-duration"></p>
+            <p class="ended-range">
+              <time id="ended-start"></time>
+              <span>bis</span>
+              <time id="ended-end"></time>
+            </p>
+          </section>
+        </div>
+
         <section class="overall" id="overall" hidden>
           <h2>✧ UNTER DEINER KONTROLLE ✧</h2>
           <p class="overall-duration" id="overall-duration"></p>
           <p class="overall-since">Seit <time id="overall-start"></time></p>
         </section>
+
         <p class="closing">DU LEIDEST JA NICHT 😉</p>
+
         <section class="history" id="history" hidden>
           <button class="history-toggle" id="history-toggle" type="button" aria-expanded="false" aria-controls="history-content">
             <span class="history-icon" aria-hidden="true">
@@ -51,18 +69,30 @@
               </svg>
             </span>
             <span class="history-toggle-text">
-              <strong>Vergangene Enthaltsamkeiten</strong>
+              <strong>Historie</strong>
               <span id="history-count"></span>
               <span id="history-action">Verlauf anzeigen</span>
             </span>
             <span id="history-chevron" aria-hidden="true">⌄</span>
           </button>
+
           <div id="history-content" hidden>
-            <div class="history-sort" id="history-sort" role="group" aria-label="Historie sortieren" hidden>
-              <button type="button" id="sort-newest" aria-pressed="true">Neueste</button>
-              <button type="button" id="sort-longest" aria-pressed="false">Längste</button>
+            <div class="history-tabs" role="tablist" aria-label="Historienansicht">
+              <button type="button" id="view-controls" role="tab" aria-selected="true">Kontrollen</button>
+              <button type="button" id="view-abstinences" role="tab" aria-selected="false">Alle Enthaltsamkeiten</button>
             </div>
-            <div id="history-list"></div>
+
+            <div id="controls-history">
+              <div id="controls-list"></div>
+            </div>
+
+            <div id="abstinences-history" hidden>
+              <div class="history-sort" id="history-sort" role="group" aria-label="Enthaltsamkeiten sortieren">
+                <button type="button" id="sort-newest" aria-pressed="true">Neueste</button>
+                <button type="button" id="sort-longest" aria-pressed="false">Längste</button>
+              </div>
+              <div id="history-list"></div>
+            </div>
           </div>
         </section>
       </section>
