@@ -237,12 +237,12 @@
       const endForDuration = control.ended === null ? Date.now() : control.ended;
       appendDuration(entry, "Dauer der Kontrolle", Math.floor((endForDuration - control.started) / 1000));
 
-      const count = document.createElement("p");
-      count.className = "control-count";
-      count.textContent = `${control.abstinences.length} ${control.abstinences.length === 1 ? "Enthaltsamkeit" : "Enthaltsamkeiten"}`;
-      entry.append(count);
-
       if (control.abstinences.length > 0) {
+        const count = document.createElement("p");
+        count.className = "control-count";
+        count.textContent = `${control.abstinences.length} ${control.abstinences.length === 1 ? "Enthaltsamkeit" : "Enthaltsamkeiten"}`;
+        entry.append(count);
+
         const details = document.createElement("details");
         details.className = "control-details";
 
