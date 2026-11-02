@@ -112,9 +112,20 @@ h1 span { display: block; margin-top: 12px; }
   line-height: 1.55;
 }
 .control-entry + .control-entry {
-  margin-top: 24px;
-  padding-top: 24px;
-  border-top: 1px solid rgba(231, 121, 170, .42);
+  position: relative;
+  margin-top: 38px;
+  padding-top: 34px;
+  border-top: 2px solid rgba(231, 121, 170, .58);
+}
+.control-entry + .control-entry::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  width: 42px;
+  height: 14px;
+  transform: translateX(-50%);
+  background: #1d172c;
 }
 .history #history-list > div + div { margin-top: 14px; border-top: 1px solid rgba(244, 207, 220, .12); }
 .control-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 9px; }
