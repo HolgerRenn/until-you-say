@@ -205,11 +205,33 @@
       heading.append(title, state);
       entry.append(heading);
 
-      const range = document.createElement("p");
+      const range = document.createElement("div");
       range.className = "control-range";
-      range.textContent = control.ended === null
-        ? `${formatted(control.started)} → läuft`
-        : `${formatted(control.started)} → ${formatted(control.ended)}`;
+
+      const startLine = document.createElement("p");
+      startLine.className = "control-range-line";
+      const startLabel = document.createElement("strong");
+      startLabel.textContent = "Start:";
+      const startDate = document.createElement("span");
+      startDate.textContent = formattedDate(control.started);
+      const startTime = document.createElement("span");
+      startTime.className = "control-range-time";
+      startTime.textContent = formattedTime(control.started);
+      startLine.append(startLabel, startDate, startTime);
+      range.append(startLine);
+
+      const endLine = document.createElement("p");
+      endLine.className = "control-range-line";
+      const endLabel = document.createElement("strong");
+      endLabel.textContent = control.ended === null ? "Status:" : "Ende:";
+      const endDate = document.createElement("span");
+      endDate.textContent = control.ended === null ? "läuft" : formattedDate(control.ended);
+      const endTime = document.createElement("span");
+      endTime.className = "control-range-time";
+      endTime.textContent = control.ended === null ? "" : formattedTime(control.ended);
+      endLine.append(endLabel, endDate, endTime);
+      range.append(endLine);
+
       entry.append(range);
 
       const endForDuration = control.ended === null ? Date.now() : control.ended;
