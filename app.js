@@ -10,8 +10,11 @@
   });
   const withinRange = (value) => Number.isSafeInteger(value) &&
     value >= Date.UTC(2000, 0, 1) && value <= Date.UTC(2100, 0, 1);
+
   let ticker;
   let sortMode = "newest";
+  let historyView = "controls";
+  let parsedData = null;
 
   function parseInstant(value) {
     if (typeof value !== "string") return NaN;
@@ -21,21 +24,60 @@
 
   function parseTimeline() {
     if (typeof timeline === "undefined" || !timeline || typeof timeline !== "object") return null;
-    if (!Array.isArray(timeline.history) || timeline.history.length > 50) return null;
-    const originalStart = parseInstant(timeline.start);
-    if (!Number.isSafeInteger(originalStart)) return null;
-    const completed = [];
-    let phaseStart = originalStart;
-    for (const event of timeline.history) {
-      if (!event || typeof event !== "object") return null;
-      const released = parseInstant(event.released);
-      const used = parseInstant(event.used);
-      if (!Number.isSafeInteger(released) || !Number.isSafeInteger(used)) return null;
-      if (released <= phaseStart || used < released) return null;
-      completed.push({ start: phaseStart, released, used });
-      phaseStart = used;
+    if (!Array.isArray(timeline.controls) || timeline.controls.length === 0 || timeline.controls.length > 50) return null;
+
+    const controls = [];
+    let previousEnd = null;
+
+    for (let controlIndex = 0; controlIndex < timeline.controls.length; controlIndex += 1) {
+      const source = timeline.controls[controlIndex];
+      if (!source || typeof source !== "object" || !Array.isArray(source.history) || source.history.length > 100) return null;
+
+      const started = parseInstant(source.started);
+      const ended = source.ended == null ? null : parseInstant(source.ended);
+      if (!Number.isSafeInteger(started)) return null;
+      if (ended !== null && (!Number.isSafeInteger(ended) || ended <= started)) return null;
+      if (previousEnd !== null && started <= previousEnd) return null;
+      if (controlIndex < timeline.controls.length - 1 && ended === null) return null;
+
+      const abstinences = [];
+      let phaseStart = started;
+
+      for (let phaseIndex = 0; phaseIndex < source.history.length; phaseIndex += 1) {
+        const event = source.history[phaseIndex];
+        if (!event || typeof event !== "object") return null;
+
+        const released = parseInstant(event.released);
+        const used = parseInstant(event.used);
+        if (!Number.isSafeInteger(released) || !Number.isSafeInteger(used)) return null;
+        if (released <= phaseStart || used < released) return null;
+
+        abstinences.push({
+          controlIndex,
+          phaseIndex,
+          start: phaseStart,
+          released,
+          used
+        });
+        phaseStart = used;
+      }
+
+      controls.push({
+        index: controlIndex,
+        started,
+        ended,
+        abstinences,
+        currentStart: phaseStart
+      });
+
+      previousEnd = ended;
     }
-    return { originalStart, completed, currentStart: phaseStart };
+
+    const current = controls[controls.length - 1];
+    const running = current.ended === null;
+    const allAbstinences = controls.flatMap(control => control.abstinences);
+
+    return { controls, current, running, allAbstinences };
   }
 
   function formatted(instant) {
@@ -50,7 +92,8 @@
     return `${timeFormatter.format(instant)} Uhr`;
   }
 
-  function durationText(total) {
+  function durationText(totalSeconds) {
+    const total = Math.max(0, totalSeconds);
     const days = Math.floor(total / 86400);
     const hours = Math.floor(total / 3600) % 24;
     const minutes = Math.floor(total / 60) % 60;
@@ -96,7 +139,6 @@
     line.className = "history-line";
 
     const icon = makeIcon(iconClass, "history-line-icon");
-
     const label = document.createElement("strong");
     label.textContent = prefix;
 
@@ -112,87 +154,177 @@
     entry.append(line);
   }
 
-  function renderHistory(completed) {
-    const history = $("history");
-    const list = $("history-list");
+  function appendDuration(entry, labelText, seconds) {
+    const duration = document.createElement("p");
+    duration.className = "history-duration";
+    const durationIcon = makeIcon("duration", "history-duration-icon");
+
+    const label = document.createElement("span");
+    label.className = "history-duration-label";
+    label.textContent = labelText;
+
+    const value = document.createElement("span");
+    value.className = "history-duration-value";
+    value.textContent = durationText(seconds);
+
+    duration.append(durationIcon, label, value);
+    entry.append(duration);
+  }
+
+  function renderAbstinence(entry, phase, includeControl) {
+    const label = document.createElement("p");
+    label.className = "history-phase-label";
+    label.textContent = includeControl
+      ? `ENTHALTSAMKEIT ${two(phase.phaseIndex + 1)} · KONTROLLE ${two(phase.controlIndex + 1)}`
+      : `ENTHALTSAMKEIT ${two(phase.phaseIndex + 1)}`;
+    entry.append(label);
+
+    appendHistoryLine(entry, "Start:", phase.start, "start");
+    appendHistoryLine(entry, "Freigabe:", phase.released, "release");
+    appendHistoryLine(entry, "Nutzung:", phase.used, "used");
+    appendDuration(entry, "Dauer der Enthaltsamkeit", Math.floor((phase.used - phase.start) / 1000));
+  }
+
+  function renderControls(controls) {
+    const list = $("controls-list");
     list.replaceChildren();
-    history.hidden = completed.length === 0;
-    if (history.hidden) return;
 
-    $("history-count").textContent =
-      `${completed.length} ${completed.length === 1 ? "abgeschlossene Phase" : "abgeschlossene Phasen"}`;
+    [...controls].reverse().forEach(control => {
+      const entry = document.createElement("section");
+      entry.className = "control-entry";
 
-    $("history-sort").hidden = completed.length < 2;
-    $("sort-newest").setAttribute("aria-pressed", String(sortMode === "newest"));
-    $("sort-longest").setAttribute("aria-pressed", String(sortMode === "longest"));
+      const heading = document.createElement("div");
+      heading.className = "control-heading";
 
-    const sorted = completed.map((phase,index) => ({...phase,index}))
-      .sort(sortMode === "longest"
-        ? (a,b) => (b.used-b.start)-(a.used-a.start) || b.used-a.used
-        : (a,b) => b.used-a.used);
+      const title = document.createElement("strong");
+      title.textContent = `KONTROLLE ${two(control.index + 1)}`;
 
-    sorted.forEach(phase => {
-      const entry = document.createElement("div");
-      const label = document.createElement("p");
-      label.className = "history-phase-label";
-      label.textContent = `ENTHALTSAMKEIT ${two(phase.index + 1)}`;
-      entry.append(label);
+      const state = document.createElement("span");
+      state.textContent = control.ended === null ? "LÄUFT" : "BEENDET";
 
-      appendHistoryLine(entry, "Start:", phase.start, "start");
-      appendHistoryLine(entry, "Freigabe:", phase.released, "release");
-      appendHistoryLine(entry, "Nutzung:", phase.used, "used");
+      heading.append(title, state);
+      entry.append(heading);
 
-      const duration = document.createElement("p");
-      duration.className = "history-duration";
+      const range = document.createElement("p");
+      range.className = "control-range";
+      range.textContent = control.ended === null
+        ? `${formatted(control.started)} → läuft`
+        : `${formatted(control.started)} → ${formatted(control.ended)}`;
+      entry.append(range);
 
-      const durationIcon = makeIcon("duration", "history-duration-icon");
+      const endForDuration = control.ended === null ? Date.now() : control.ended;
+      appendDuration(entry, "Dauer der Kontrolle", Math.floor((endForDuration - control.started) / 1000));
 
-      const durationLabel = document.createElement("span");
-      durationLabel.className = "history-duration-label";
-      durationLabel.textContent = "Dauer der Enthaltsamkeit";
+      const count = document.createElement("p");
+      count.className = "control-count";
+      count.textContent = `${control.abstinences.length} ${control.abstinences.length === 1 ? "Enthaltsamkeit" : "Enthaltsamkeiten"}`;
+      entry.append(count);
 
-      const durationValue = document.createElement("span");
-      durationValue.className = "history-duration-value";
-      durationValue.textContent = durationText(Math.floor((phase.used - phase.start) / 1000));
+      if (control.abstinences.length > 0) {
+        const details = document.createElement("details");
+        details.className = "control-details";
 
-      duration.append(durationIcon, durationLabel, durationValue);
-      entry.append(duration);
+        const summary = document.createElement("summary");
+        summary.textContent = "Enthaltsamkeiten anzeigen";
+        details.append(summary);
+
+        const phases = document.createElement("div");
+        phases.className = "control-phases";
+
+        control.abstinences.forEach(phase => {
+          const phaseEntry = document.createElement("div");
+          phaseEntry.className = "nested-phase";
+          renderAbstinence(phaseEntry, phase, false);
+          phases.append(phaseEntry);
+        });
+
+        details.append(phases);
+        entry.append(details);
+      }
+
       list.append(entry);
     });
   }
 
+  function renderAllAbstinences(allAbstinences) {
+    const list = $("history-list");
+    list.replaceChildren();
+
+    const sorted = [...allAbstinences].sort(sortMode === "longest"
+      ? (a, b) => (b.used - b.start) - (a.used - a.start) || b.used - a.used
+      : (a, b) => b.used - a.used);
+
+    sorted.forEach(phase => {
+      const entry = document.createElement("div");
+      renderAbstinence(entry, phase, true);
+      list.append(entry);
+    });
+
+    $("history-sort").hidden = allAbstinences.length < 2;
+    $("sort-newest").setAttribute("aria-pressed", String(sortMode === "newest"));
+    $("sort-longest").setAttribute("aria-pressed", String(sortMode === "longest"));
+  }
+
+  function renderHistory(data) {
+    const history = $("history");
+    const completedControls = data.controls.filter(control => control.ended !== null);
+    const hasHistory = completedControls.length > 0 || data.allAbstinences.length > 0;
+    history.hidden = !hasHistory;
+    if (!hasHistory) return;
+
+    $("history-count").textContent =
+      `${completedControls.length} ${completedControls.length === 1 ? "Kontrolle" : "Kontrollen"} · ${data.allAbstinences.length} ${data.allAbstinences.length === 1 ? "Enthaltsamkeit" : "Enthaltsamkeiten"}`;
+
+    $("view-controls").setAttribute("aria-selected", String(historyView === "controls"));
+    $("view-abstinences").setAttribute("aria-selected", String(historyView === "abstinences"));
+    $("controls-history").hidden = historyView !== "controls";
+    $("abstinences-history").hidden = historyView !== "abstinences";
+
+    renderControls(data.controls);
+    renderAllAbstinences(data.allAbstinences);
+  }
+
   function render() {
     clearInterval(ticker);
-    const data = parseTimeline();
-    $("timer-view").hidden = !data;
-    if (!data) return;
+    parsedData = parseTimeline();
+    $("timer-view").hidden = !parsedData;
+    if (!parsedData) return;
 
-    const hasHistory = data.completed.length > 0;
-    $("overall").hidden = !hasHistory;
+    const { current, running } = parsedData;
+    $("running-view").hidden = !running;
+    $("ended-view").hidden = running;
+    $("overall").hidden = !running;
 
-    if (hasHistory) {
-      $("overall-start").dateTime = new Date(data.originalStart).toISOString();
-      $("overall-start").textContent = formatted(data.originalStart);
-    }
+    if (running) {
+      $("phase-label").textContent =
+        `KONTROLLE ${two(current.index + 1)} · AKTUELLE ENTHALTSAMKEIT ${two(current.abstinences.length + 1)}`;
 
-    const label = $("phase-label");
-    label.hidden = !hasHistory;
-    label.textContent = hasHistory ? `AKTUELLE ENTHALTSAMKEIT · NR. ${two(data.completed.length + 1)}` : "";
+      $("start-time").dateTime = new Date(current.currentStart).toISOString();
+      $("start-time").textContent = formatted(current.currentStart);
+      $("overall-start").dateTime = new Date(current.started).toISOString();
+      $("overall-start").textContent = formatted(current.started);
 
-    $("start-time").dateTime = new Date(data.currentStart).toISOString();
-    $("start-time").textContent = formatted(data.currentStart);
-    renderHistory(data.completed);
-
-    function tick() {
-      const now = Date.now();
-      $("days").textContent = Math.floor(Math.max(0, now - data.currentStart) / 86400000);
-      if (hasHistory) {
-        $("overall-duration").textContent = durationText(Math.floor(Math.max(0,now-data.originalStart)/1000));
+      function tick() {
+        const now = Date.now();
+        $("days").textContent = Math.floor(Math.max(0, now - current.currentStart) / 86400000);
+        $("overall-duration").textContent =
+          durationText(Math.floor(Math.max(0, now - current.started) / 1000));
+        if (historyView === "controls") renderControls(parsedData.controls);
       }
+
+      tick();
+      ticker = setInterval(tick, 30000);
+    } else {
+      $("ended-duration").textContent =
+        durationText(Math.floor((current.ended - current.started) / 1000));
+
+      $("ended-start").dateTime = new Date(current.started).toISOString();
+      $("ended-start").textContent = formatted(current.started);
+      $("ended-end").dateTime = new Date(current.ended).toISOString();
+      $("ended-end").textContent = formatted(current.ended);
     }
 
-    tick();
-    ticker = setInterval(tick, 30000);
+    renderHistory(parsedData);
   }
 
   function loadTimeline() {
@@ -212,8 +344,29 @@
     $("history-action").textContent = isOpen ? "Verlauf anzeigen" : "Verlauf ausblenden";
   });
 
-  $("sort-newest").addEventListener("click", () => { sortMode = "newest"; render(); });
-  $("sort-longest").addEventListener("click", () => { sortMode = "longest"; render(); });
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });
+  $("view-controls").addEventListener("click", () => {
+    historyView = "controls";
+    renderHistory(parsedData);
+  });
+
+  $("view-abstinences").addEventListener("click", () => {
+    historyView = "abstinences";
+    renderHistory(parsedData);
+  });
+
+  $("sort-newest").addEventListener("click", () => {
+    sortMode = "newest";
+    renderHistory(parsedData);
+  });
+
+  $("sort-longest").addEventListener("click", () => {
+    sortMode = "longest";
+    renderHistory(parsedData);
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) render();
+  });
+
   loadTimeline();
 })();
