@@ -111,7 +111,11 @@ h1 span { display: block; margin-top: 12px; }
   font-size: 12px;
   line-height: 1.55;
 }
-.control-entry + .control-entry,
+.control-entry + .control-entry {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(231, 121, 170, .42);
+}
 .history #history-list > div + div { margin-top: 14px; border-top: 1px solid rgba(244, 207, 220, .12); }
 .control-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 9px; }
 .control-heading strong { color: #e5a8bf; font-size: 10px; font-weight: 750; letter-spacing: .16em; }
